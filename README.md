@@ -62,46 +62,81 @@ FinGuard AI is an enterprise-grade financial fraud prevention and risk intellige
 
 ---
 
-## 4. Quickstart Guide
+## 4. How to Run FinGuard AI
 
-### 4.1 Prerequisites
-- Python 3.11+
-- Node.js 18+ and npm
-- Git
+You can run FinGuard AI either using **Docker Compose** (recommended for production/containers) or **locally via PowerShell / Terminal**.
 
-### 4.2 Clone & Environment Setup
+### Option A: One-Command Docker Compose (Full Stack)
+```bash
+# Build and run Postgres, Backend, and Frontend in unified isolated network
+docker-compose up --build
+```
+- Frontend UI: `http://localhost:5173`
+- Backend API Docs (Swagger): `http://localhost:8000/docs`
+- Healthcheck: `http://localhost:8000/api/health`
+
+---
+
+### Option B: Local Development Setup
+
+#### Step 1: Clone Repository
 ```bash
 git clone https://github.com/Manojhr06/Invoice-checker.git
 cd Invoice-checker
+```
 
-# Copy environment configuration template
+#### Step 2: Configure Environment
+Copy the pre-configured `.env.example` to `.env`:
+```powershell
+# On Windows PowerShell:
+Copy-Item .env.example .env
+
+# On Linux / macOS:
 cp .env.example .env
 ```
 
-### 4.3 Backend Setup & Seeding
-```bash
-# Create and activate virtual environment
+#### Step 3: Run Backend (FastAPI + ML Engine)
+```powershell
+# On Windows:
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+.\.venv\Scripts\activate
+pip install -r backend/requirements.txt
 
-# Install dependencies
-pip install -r backend/requirements.txt  # Or via uv pip install
+# Start backend server (auto-seeds Acme Global & demo accounts on boot)
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+```bash
+# On Linux / macOS:
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
 
-# Run database tests and seed verification
-pytest backend/tests -v
-
-# Start FastAPI server
+# Start backend server
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 4.4 Frontend Setup
-```bash
+#### Step 4: Run Frontend (React + Vite)
+In a separate terminal window:
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-Visit `http://localhost:5173` to access the application dashboard.
+Open your browser at **`http://localhost:5173`**.
+
+---
+
+### Step 5: Run Automated Security & Platform Test Suite
+To execute the comprehensive 14-test test suite:
+```powershell
+# On Windows (PowerShell):
+$env:PYTHONPATH="."
+.\.venv\Scripts\pytest backend/tests/ -v
+
+# On Linux / macOS:
+PYTHONPATH=. pytest backend/tests/ -v
+```
 
 ---
 
@@ -115,6 +150,8 @@ Upon startup, the database automatically provisions the default organization **A
 | **FINANCE_MANAGER** | `finance.manager@acmeglobal.com` | `FinGuard@123` | Invoice review, approvals/rejections, fraud investigations |
 | **FINANCE_EMPLOYEE** | `finance.employee@acmeglobal.com` | `FinGuard@123` | Invoice upload, OCR correction, verification submission |
 | **AUDITOR** | `auditor@acmeglobal.com` | `FinGuard@123` | Read-only forensic audits, immutable audit trails, analytics |
+
+> **Tip**: On the login page, you can use the **1-Click Quick Demo Account Switcher** cards to instantly pre-fill and log in under any of the 4 roles.
 
 ---
 
